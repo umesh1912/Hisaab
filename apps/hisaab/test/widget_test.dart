@@ -45,7 +45,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Shares'));
     await tester.pumpAndSettle();
-    await tester.tapAt(const Offset(180, 20)); // close the sheet
+    Navigator.of(tester.element(find.text('Save expense'))).pop(); // close the sheet
     await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Flat settings'));
