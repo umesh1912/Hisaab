@@ -82,7 +82,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 Text('Flat spending', style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 120,
+                  height: 150,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -93,10 +93,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text(inr(totals[key(m)]!), style: tt.labelSmall),
+                                FittedBox(fit: BoxFit.scaleDown, child: Text(inr(totals[key(m)]!), style: tt.labelSmall)),
                                 const SizedBox(height: 4),
                                 Container(
-                                  height: 70 * totals[key(m)]! / maxT + 4,
+                                  height: 60 * totals[key(m)]! / maxT + 4,
                                   decoration: BoxDecoration(
                                     color: m.month == now.month ? cs.primary : cs.primaryContainer,
                                     borderRadius: BorderRadius.circular(8),

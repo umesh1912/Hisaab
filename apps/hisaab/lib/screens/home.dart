@@ -75,7 +75,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 6),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     if (myDebts.any((t) => t.from == d.meId))
                       FilledButton.icon(
@@ -83,7 +86,6 @@ class HomeScreen extends StatelessWidget {
                         icon: const Icon(Icons.send_to_mobile),
                         label: const Text('Settle up'),
                       ),
-                    const Spacer(),
                     TextButton(onPressed: () => onGo(4), child: const Text('All balances')),
                   ],
                 ),

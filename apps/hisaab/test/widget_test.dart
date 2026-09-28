@@ -41,6 +41,17 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     expect(find.text('Save expense'), findsOneWidget);
+    await tester.tap(find.text('Exact'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Shares'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(180, 20)); // close the sheet
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Flat settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Add flatmate'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('creating a flat saves members', (tester) async {
