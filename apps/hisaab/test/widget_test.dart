@@ -4,16 +4,30 @@ import 'package:hisaab/main.dart';
 import 'package:hisaab/store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Runs the app on a typical phone screen (360 x 800).
+Future<HisaabStore> startApp(WidgetTester tester) async {
+  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.devicePixelRatio = 3.0;
+  addTearDown(tester.view.reset);
+  SharedPreferences.setMockInitialValues({});
+  final store = HisaabStore();
+  await store.load();
+  await tester.pumpWidget(HisaabApp(store: store));
+  await tester.pumpAndSettle();
+  return store;
+}
+
+Future<void> scrollTo(WidgetTester tester, Finder f) async {
+  await tester.scrollUntilVisible(f, 200, scrollable: find.byType(Scrollable).first);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('onboarding, sample data and every tab render', (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final store = HisaabStore();
-    await store.load();
-    await tester.pumpWidget(HisaabApp(store: store));
-    await tester.pumpAndSettle();
+    await startApp(tester);
 
-    expect(find.text('Create flat'), findsOneWidget);
-    await tester.ensureVisible(find.text('Explore with sample data'));
+    expect(find.text('Hisaab'), findsOneWidget);
+    await scrollTo(tester, find.text('Explore with sample data'));
     await tester.tap(find.text('Explore with sample data'));
     await tester.pumpAndSettle();
     expect(find.text('Flat 3B'), findsOneWidget);
@@ -24,23 +38,19 @@ void main() {
     }
     expect(tester.takeException(), isNull);
 
-    // Open the add expense sheet
-    await tester.tap(find.text('Add expense'));
+    await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     expect(find.text('Save expense'), findsOneWidget);
   });
 
   testWidgets('creating a flat saves members', (tester) async {
-    SharedPreferences.setMockInitialValues({});
-    final store = HisaabStore();
-    await store.load();
-    await tester.pumpWidget(HisaabApp(store: store));
-    await tester.pumpAndSettle();
+    final store = await startApp(tester);
 
     await tester.enterText(find.widgetWithText(TextField, 'Flat name'), 'Flat 7');
     await tester.enterText(find.widgetWithText(TextField, 'Your name'), 'Umesh');
+    await scrollTo(tester, find.widgetWithText(TextField, 'Name 1'));
     await tester.enterText(find.widgetWithText(TextField, 'Name 1'), 'Ravi');
-    await tester.ensureVisible(find.text('Create flat'));
+    await scrollTo(tester, find.text('Create flat'));
     await tester.tap(find.text('Create flat'));
     await tester.pumpAndSettle();
 
