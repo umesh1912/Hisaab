@@ -24,7 +24,21 @@ Future<void> scrollTo(WidgetTester tester, Finder f) async {
 }
 
 /// Scrolls a widget into view (in a sheet or a list) and taps it.
+/// Works even when the widget is in a lazy list and not built yet.
 Future<void> tapVisible(WidgetTester tester, Finder f) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  if (f.evaluate().isEmpty) {
+    final scrollables = find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down).hitTestable();
+    for (final e in scrollables.evaluate().toList().reversed) {
+      if (f.evaluate().isNotEmpty) break;
+      final s = find.byElementPredicate((x) => x == e);
+      for (var i = 0; i < 40 && f.evaluate().isEmpty; i++) {
+        await tester.drag(s, const Offset(0, -150), warnIfMissed: false);
+        await tester.pumpAndSettle();
+      }
+    }
+  }
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
   await tester.tap(f);

@@ -127,8 +127,12 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Medicine'), 'Metformin');
-    await showIt(tester, find.text('Add medicine'), sheetScroll());
-    await tester.tap(find.text('Add medicine'));
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
+    final save = find.widgetWithText(FilledButton, 'Add medicine');
+    await showIt(tester, save, sheetScroll());
+    await tester.pumpAndSettle();
+    await tester.tap(save.hitTestable());
     await tester.pumpAndSettle();
 
     expect(store.data?.meds.length, 1);
