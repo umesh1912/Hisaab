@@ -39,6 +39,35 @@ Future<void> closeSheet(WidgetTester tester, Finder inSheet) async {
   await tester.pumpAndSettle();
 }
 
+/// Scrolls a widget into view (in a sheet or a list) and taps it.
+/// Works even when the widget is in a lazy list and not built yet, above or below.
+Future<void> tapVisible(WidgetTester tester, Finder f) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  bool ready() => f.hitTestable().evaluate().isNotEmpty;
+  if (!ready()) {
+    final scrollables = find.byWidgetPredicate((w) => w is Scrollable && w.axisDirection == AxisDirection.down).hitTestable();
+    for (final e in scrollables.evaluate().toList().reversed) {
+      if (ready()) break;
+      final s = find.byElementPredicate((x) => x == e);
+      for (final dy in [300.0, -150.0]) {
+        for (var i = 0; i < 40 && !ready(); i++) {
+          if (f.evaluate().isNotEmpty) {
+            await tester.ensureVisible(f);
+            await tester.pumpAndSettle();
+            if (ready()) break;
+          }
+          await tester.drag(s, Offset(0, dy), warnIfMissed: false);
+          await tester.pumpAndSettle();
+        }
+        if (ready()) break;
+      }
+    }
+  }
+  await tester.tap(f.hitTestable().first);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('onboarding, sample data, every tab and the main sheets render', (tester) async {
     await startApp(tester);
@@ -131,8 +160,7 @@ void main() {
     // Genda Phool Decor is due soonest, so it is first; the amount is prefilled.
     await tester.tap(find.text('Record payment').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Save payment'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Save payment'));
 
     expect(decor.paid, paidBefore + 15000000);
     expect(line.paid, budgetBefore + 15000000);
@@ -148,10 +176,7 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Family'), 'Test family');
-    await tester.ensureVisible(find.text('Save family'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Save family'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Save family'));
 
     expect(store.data!.guests.length, 31);
     expect(store.data!.guests.last.name, 'Test family');
