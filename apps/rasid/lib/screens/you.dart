@@ -19,6 +19,7 @@ class YouScreen extends StatelessWidget {
     final roomWidth = (MediaQuery.sizeOf(context).width - 32 - 8) / 2;
 
     return ListView(
+      key: const Key('you-list'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         Card(

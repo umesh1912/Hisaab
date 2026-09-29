@@ -50,7 +50,12 @@ void main() {
     await scrollTo(tester, find.text('Explore with sample data'));
     await tester.tap(find.text('Explore with sample data'));
     await tester.pumpAndSettle();
-    expect(find.text('Best matches'.toUpperCase()), findsOneWidget);
+    expect(find.text('Wants my skills'), findsOneWidget);
+    final discoverList = find.descendant(of: find.byType(DiscoverScreen), matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(find.text('BEST MATCHES'), 300, scrollable: discoverList);
+    await tester.pumpAndSettle();
+    await tester.drag(discoverList, const Offset(0, 3000));
+    await tester.pumpAndSettle();
 
     for (final label in ['Swaps', 'Messages', 'Credits', 'Profile', 'Discover']) {
       await goTab(tester, label);
@@ -108,8 +113,7 @@ void main() {
     await clearToast(tester);
 
     // Run the first upcoming session and rate it.
-    await tester.tap(find.textContaining('Upcoming'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.textContaining('Upcoming'));
     final ledgerBefore = store.data!.ledger.length;
     await tapVisible(tester, find.text('Start session').first);
     expect(find.text('Check in'), findsOneWidget);
@@ -120,8 +124,7 @@ void main() {
     await clearToast(tester);
 
     // Past sessions list.
-    await tester.tap(find.textContaining('Past'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.textContaining('Past'));
     expect(tester.takeException(), isNull);
   });
 
@@ -132,29 +135,25 @@ void main() {
     await tester.pumpAndSettle();
 
     await goTab(tester, 'Profile');
-    await tester.tap(find.byKey(const ValueKey('add-teach')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const ValueKey('add-teach')));
     expect(find.text('Add a skill you teach'), findsOneWidget);
     await tester.enterText(find.widgetWithText(TextField, 'Skill'), 'Public speaking');
     await tapVisible(tester, find.text('Add skill'));
     expect(store.data!.me.teachNames.contains('Public speaking'), isTrue);
     await clearToast(tester);
 
-    await tester.tap(find.byKey(const ValueKey('add-learn')));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byKey(const ValueKey('add-learn')));
     expect(find.text('Add something to learn'), findsOneWidget);
     Navigator.of(tester.element(find.text('Add something to learn'))).pop();
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Edit profile'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.byTooltip('Edit profile'));
     expect(find.text('Save profile'), findsOneWidget);
     Navigator.of(tester.element(find.text('Save profile'))).pop();
     await tester.pumpAndSettle();
 
     await goTab(tester, 'Messages');
-    await tester.tap(find.text('Vikram S.'));
-    await tester.pumpAndSettle();
+    await tapVisible(tester, find.text('Vikram S.'));
     final before = store.data!.threads['vikram']!.length;
     await tester.enterText(find.byType(TextField).last, 'See you Saturday');
     await tapVisible(tester, find.byTooltip('Send'));

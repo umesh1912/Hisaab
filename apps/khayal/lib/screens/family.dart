@@ -18,6 +18,7 @@ class FamilyScreen extends StatelessWidget {
     final order = ladder(d.helpers);
 
     return ListView(
+      key: const ValueKey('list-family'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         const SectionTitle('Who gets told'),

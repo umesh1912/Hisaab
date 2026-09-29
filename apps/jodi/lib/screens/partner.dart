@@ -147,6 +147,7 @@ class _FeedItem extends StatelessWidget {
                         children: [
                           for (final r in reactions)
                             ChoiceChip(
+                              key: ValueKey('react-${event.id}-$r'),
                               label: Text(r),
                               selected: react == r,
                               showCheckmark: false,

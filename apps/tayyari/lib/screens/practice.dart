@@ -305,13 +305,16 @@ class _SessionView extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
                       child: Column(
                         children: [
-                          Text(
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
                             label,
                             style: TextStyle(
                               fontWeight: FontWeight.w800,
                               fontSize: 13,
                               color: g == 1 ? t.bad : (g == 4 ? t.good : cs.onSurface),
                             ),
+                          ),
                           ),
                           FittedBox(
                             fit: BoxFit.scaleDown,

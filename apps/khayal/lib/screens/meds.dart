@@ -26,6 +26,7 @@ class MedsScreen extends StatelessWidget {
     ].join(', ');
 
     return ListView(
+      key: const ValueKey('list-meds'),
       padding: const EdgeInsets.only(bottom: 96),
       children: [
         const WhoSwitch(),

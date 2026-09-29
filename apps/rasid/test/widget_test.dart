@@ -22,10 +22,19 @@ Future<void> scrollTo(WidgetTester tester, Finder f) async {
   await tester.pumpAndSettle();
 }
 
-Future<void> tapVisible(WidgetTester tester, Finder f) async {
-  await tester.ensureVisible(f);
+/// The Scrollable inside the widget with [key]. Tab lists and sheets carry stable
+/// keys; `.last` picks the top sheet when two are stacked.
+Finder scrollableIn(String key) =>
+    find.descendant(of: find.byKey(Key(key)).last, matching: find.byType(Scrollable)).first;
+
+/// Drops keyboard focus (so a focused field can't scroll its caret back into view),
+/// scrolls [scrollable] until [f] can be hit, then taps it.
+Future<void> tapIn(WidgetTester tester, Finder f, String scrollable) async {
+  FocusManager.instance.primaryFocus?.unfocus();
   await tester.pumpAndSettle();
-  await tester.tap(f);
+  await tester.scrollUntilVisible(f, 150, scrollable: scrollableIn(scrollable));
+  await tester.pumpAndSettle();
+  await tester.tap(f.hitTestable());
   await tester.pumpAndSettle();
 }
 
@@ -61,8 +70,8 @@ void main() {
     await tester.tap(find.text('Paste bill or order email text'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const Key('paste-box')), 'CROMA\nInvoice No: CRM/1/22\nDate: 14/03/2025\nLG Air Conditioner  41,990.00\nTotal: 41,990.00');
-    await tester.tap(find.text('Read the text'));
     await tester.pumpAndSettle();
+    await tapIn(tester, find.text('Read the text'), 'app-sheet');
     expect(find.textContaining('Check the fields marked below'), findsOneWidget);
     await closeSheet(tester, find.text('Save to vault'));
 
@@ -70,7 +79,7 @@ void main() {
     await tester.tap(find.text('Prestige Mixer grinder').first);
     await tester.pumpAndSettle();
     expect(find.text('Remove from vault'), findsOneWidget);
-    await tapVisible(tester, find.text("Something's wrong: start a claim"));
+    await tapIn(tester, find.text("Something's wrong: start a claim"), 'app-sheet');
     expect(find.text('Proof checklist'), findsOneWidget);
     await closeSheet(tester, find.text('Proof checklist'));
     await closeSheet(tester, find.text('Remove from vault'));
@@ -78,22 +87,16 @@ void main() {
 
     // Claims: update and escalate.
     await goTab(tester, 'Claims');
-    await tapVisible(tester, find.text('Update status'));
+    await tapIn(tester, find.text('Update status'), 'claims-list');
     expect(find.text('Or add what happened'), findsOneWidget);
     await closeSheet(tester, find.text('Or add what happened'));
-    await tapVisible(tester, find.text("It's taking too long"));
+    await tapIn(tester, find.text("It's taking too long"), 'claims-list');
     expect(find.text('Escalate this claim'), findsOneWidget);
     await closeSheet(tester, find.text('Escalate this claim'));
 
     // Reminders: add a service reminder.
     await goTab(tester, 'Reminders');
-    final remindersList = find
-        .ancestor(of: find.textContaining('Warranty end dates and service dates'), matching: find.byType(Scrollable))
-        .first;
-    await tester.scrollUntilVisible(find.byIcon(Icons.add_alarm), 200, scrollable: remindersList);
-    await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.add_alarm));
-    await tester.pumpAndSettle();
+    await tapIn(tester, find.byIcon(Icons.add_alarm), 'reminders-list');
     expect(find.text('Save reminder'), findsOneWidget);
     await closeSheet(tester, find.text('Save reminder'));
 
@@ -118,6 +121,8 @@ void main() {
     final store = await startApp(tester);
 
     await tester.enterText(find.widgetWithText(TextField, 'Your name'), 'Umesh');
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await scrollTo(tester, find.text('Create my vault'));
     await tester.tap(find.text('Create my vault'));
     await tester.pumpAndSettle();
@@ -130,7 +135,8 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'Brand'), 'Philips');
     await tester.enterText(find.widgetWithText(TextField, 'Item'), 'Air fryer');
     await tester.enterText(find.widgetWithText(TextField, 'Price (₹)'), '8999');
-    await tapVisible(tester, find.text('Save to vault'));
+    await tester.pumpAndSettle();
+    await tapIn(tester, find.text('Save to vault'), 'app-sheet');
 
     expect(store.data?.items.length, 1);
     expect(store.data?.items.first.price, 899900);

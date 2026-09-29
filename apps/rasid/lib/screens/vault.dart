@@ -20,6 +20,7 @@ class VaultScreen extends StatelessWidget {
     }
 
     return ListView(
+      key: const Key('vault-list'),
       padding: const EdgeInsets.only(bottom: 96),
       children: [
         Padding(

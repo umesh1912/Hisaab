@@ -133,15 +133,19 @@ class Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[Icon(icon, size: 14, color: fg), const SizedBox(width: 4)],
-          Text(text, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12)),
-        ],
+    // FittedBox scales the label down instead of overflowing when a slot (e.g. ListTile leading) is narrow.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[Icon(icon, size: 14, color: fg), const SizedBox(width: 4)],
+            Text(text, maxLines: 1, style: TextStyle(color: fg, fontWeight: FontWeight.w700, fontSize: 12)),
+          ],
+        ),
       ),
     );
   }

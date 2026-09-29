@@ -106,6 +106,7 @@ Future<T?> showAppSheet<T>(BuildContext context, Widget Function(BuildContext) b
     builder: (ctx) => Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
       child: SingleChildScrollView(
+        key: const Key('app-sheet'),
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
         child: builder(ctx),
       ),

@@ -18,8 +18,16 @@ Future<KhayalStore> startApp(WidgetTester tester) async {
   return store;
 }
 
-Future<void> showIt(WidgetTester tester, Finder f) async {
-  await tester.ensureVisible(f);
+/// The scrollable of a screen's list (by key) — never a hidden IndexedStack tab.
+Finder listOf(String name) =>
+    find.descendant(of: find.byKey(ValueKey('list-$name')), matching: find.byType(Scrollable)).first;
+
+/// The scrollable inside the open bottom sheet.
+Finder sheetScroll() => find.descendant(of: find.byType(BottomSheet), matching: find.byType(Scrollable)).first;
+
+/// Scrolls [scrollable] until [f] is built and on screen.
+Future<void> showIt(WidgetTester tester, Finder f, Finder scrollable) async {
+  await tester.scrollUntilVisible(f, 150, scrollable: scrollable);
   await tester.pumpAndSettle();
 }
 
@@ -35,7 +43,7 @@ void main() {
     await startApp(tester);
 
     expect(find.text('Khayal'), findsOneWidget);
-    await showIt(tester, find.text('Explore with sample data'));
+    await showIt(tester, find.text('Explore with sample data'), listOf('onboarding'));
     await tester.tap(find.text('Explore with sample data'));
     await tester.pumpAndSettle();
     expect(find.text('Looking after Papa and Mummy'), findsOneWidget);
@@ -55,12 +63,12 @@ void main() {
     // Health: reading sheet and doctor summary
     await tester.tap(navTab('Health'));
     await tester.pumpAndSettle();
-    await showIt(tester, find.text('Add reading'));
+    await showIt(tester, find.text('Add reading'), listOf('health'));
     await tester.tap(find.text('Add reading'));
     await tester.pumpAndSettle();
     expect(find.text('Save reading'), findsOneWidget);
     await closeSheet(tester, find.text('Save reading'));
-    await showIt(tester, find.text('Doctor summary'));
+    await showIt(tester, find.text('Doctor summary'), listOf('health'));
     await tester.tap(find.text('Doctor summary'));
     await tester.pumpAndSettle();
     expect(find.text('Copy'), findsOneWidget);
@@ -69,7 +77,7 @@ void main() {
     // Refills: order sheet
     await tester.tap(navTab('Refills'));
     await tester.pumpAndSettle();
-    await showIt(tester, find.text('Send list to chemist'));
+    await showIt(tester, find.text('Send list to chemist'), listOf('refills'));
     await tester.tap(find.text('Send list to chemist'));
     await tester.pumpAndSettle();
     expect(find.text('Copy'), findsOneWidget);
@@ -78,7 +86,7 @@ void main() {
     // Family: invite sheet
     await tester.tap(navTab('Family'));
     await tester.pumpAndSettle();
-    await showIt(tester, find.text('Invite'));
+    await showIt(tester, find.text('Invite'), listOf('family'));
     await tester.tap(find.text('Invite'));
     await tester.pumpAndSettle();
     expect(find.text('Add a helper'), findsOneWidget);
@@ -109,7 +117,7 @@ void main() {
     final store = await startApp(tester);
 
     await tester.enterText(find.widgetWithText(TextField, 'Your name'), 'Umesh');
-    await showIt(tester, find.text('Start'));
+    await showIt(tester, find.text('Start'), listOf('onboarding'));
     await tester.tap(find.text('Start'));
     await tester.pumpAndSettle();
 
@@ -119,7 +127,7 @@ void main() {
     await tester.tap(find.byType(FloatingActionButton));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Medicine'), 'Metformin');
-    await showIt(tester, find.text('Add medicine'));
+    await showIt(tester, find.text('Add medicine'), sheetScroll());
     await tester.tap(find.text('Add medicine'));
     await tester.pumpAndSettle();
 

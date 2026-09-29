@@ -24,6 +24,7 @@ class HomeScreen extends StatelessWidget {
     final recent = [...items]..sort((a, b) => b.date.compareTo(a.date));
 
     return ListView(
+      key: const Key('home-list'),
       padding: const EdgeInsets.only(bottom: 96),
       children: [
         Container(

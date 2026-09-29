@@ -47,6 +47,7 @@ class HealthScreen extends StatelessWidget {
       });
 
     return ListView(
+      key: const ValueKey('list-health'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         const WhoSwitch(),

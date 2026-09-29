@@ -95,7 +95,8 @@ class _PersonSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (learns.contains(t.name.toLowerCase())) const Tag('On your list', tone: TagTone.match),
+                if (learns.contains(t.name.toLowerCase()))
+                  const Flexible(child: Tag('On your list', tone: TagTone.match)),
               ],
             ),
           ),

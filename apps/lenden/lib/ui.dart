@@ -166,7 +166,14 @@ class Tag extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (icon != null) ...[Icon(icon, size: 13, color: fg), const SizedBox(width: 4)],
-          Text(text, style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700)),
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: fg, fontSize: 12, fontWeight: FontWeight.w700),
+            ),
+          ),
         ],
       ),
     );
@@ -247,9 +254,10 @@ class SummaryBox extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(r.$1, style: TextStyle(color: cs.onSurfaceVariant)),
+                  Flexible(child: Text(r.$1, style: TextStyle(color: cs.onSurfaceVariant))),
                   const SizedBox(width: 12),
                   Expanded(
+                    flex: 2,
                     child: Text(r.$2, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ],

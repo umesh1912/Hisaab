@@ -94,9 +94,9 @@ void main() {
 
     // Partner tab: react, and open the Sunday check-in.
     await goTab(tester, 'Tara');
-    final fire = inScreen(PartnerScreen, find.text('🔥')).first;
-    await tester.ensureVisible(fire);
-    await tester.pumpAndSettle();
+    // Feed items are built lazily: scroll the partner list until Tara's first event is built.
+    final fire = find.byKey(const ValueKey('react-501-🔥'));
+    await scrollTo(tester, fire, inScreen: PartnerScreen);
     await tester.tap(fire);
     await tester.pumpAndSettle();
     await scrollTo(tester, find.text('Answer this week’s questions'), inScreen: PartnerScreen);
@@ -112,10 +112,16 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Ask to pair up').first);
     await tester.pumpAndSettle();
+    expect(store.data!.feed.firstWhere((e) => e.id == 501).react, '🔥');
     expect(store.data!.matchRequests, contains('Meera'));
     await closeSheet(tester, find.text('Kabir'));
 
-    await tester.ensureVisible(find.byTooltip('Edit names and pact'));
+    // The profile header is at the top of the You list; scroll back up to it.
+    await tester.scrollUntilVisible(
+      find.byTooltip('Edit names and pact'),
+      -200,
+      scrollable: inScreen(YouScreen, find.byType(Scrollable)).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Edit names and pact'));
     await tester.pumpAndSettle();

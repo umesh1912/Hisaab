@@ -33,6 +33,22 @@ Future<void> closeSheets(WidgetTester tester, Finder inside) async {
   await tester.pumpAndSettle();
 }
 
+/// Hides the keyboard, scrolls [scrollable] until [f] can really be hit, then taps it.
+Future<void> revealAndTap(WidgetTester tester, Finder f, Finder scrollable) async {
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pumpAndSettle();
+  await tester.dragUntilVisible(f.hitTestable(), scrollable, const Offset(0, -200));
+  await tester.pumpAndSettle();
+  await tester.tap(f.hitTestable());
+  await tester.pumpAndSettle();
+}
+
+/// The scroll view of the top-most bottom sheet.
+Finder sheetScroll() => find.descendant(of: find.byType(BottomSheet).last, matching: find.byType(Scrollable)).first;
+
+/// The scroll view of the visible tab.
+Finder pageScroll() => find.byType(Scrollable).first;
+
 void main() {
   testWidgets('onboarding, sample data, every tab and the main sheets render', (tester) async {
     final store = await startApp(tester);
@@ -71,10 +87,7 @@ void main() {
     await tester.tap(find.descendant(of: sheet, matching: find.widgetWithText(ChoiceChip, 'Tomato')));
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Where it lives'), 'Terrace (open)');
-    await tester.ensureVisible(find.text('Save plant'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Save plant'));
-    await tester.pumpAndSettle();
+    await revealAndTap(tester, find.text('Save plant'), sheetScroll());
     expect(store.data!.plants.length, 9);
     expect(store.data!.plants.last.speciesId, 'tomato');
 
@@ -82,10 +95,7 @@ void main() {
     await tester.tap(find.text('Hibiscus').first);
     await tester.pumpAndSettle();
     expect(find.text('Recent care'), findsOneWidget);
-    await tester.ensureVisible(find.text('Something wrong?'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Something wrong?'));
-    await tester.pumpAndSettle();
+    await revealAndTap(tester, find.text('Something wrong?'), sheetScroll());
     expect(find.text("What's wrong?"), findsOneWidget);
     await closeSheets(tester, find.text("What's wrong?"));
     await closeSheets(tester, find.text('Recent care'));
@@ -104,10 +114,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('White cottony spots'));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Mealybugs'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Mealybugs'));
-    await tester.pumpAndSettle();
+    await revealAndTap(tester, find.text('Mealybugs'), pageScroll());
     expect(find.text('What to do'), findsOneWidget);
     await closeSheets(tester, find.text('What to do'));
 
@@ -142,10 +149,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(find.widgetWithText(TextField, 'Name'), 'Fern');
     await tester.enterText(find.widgetWithText(TextField, 'Where it lives'), 'Bathroom window');
-    await tester.ensureVisible(find.text('Save plant'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Save plant'));
-    await tester.pumpAndSettle();
+    await revealAndTap(tester, find.text('Save plant'), sheetScroll());
     expect(store.data!.plants.single.name, 'Fern');
 
     await tapTab(tester, 'Away');

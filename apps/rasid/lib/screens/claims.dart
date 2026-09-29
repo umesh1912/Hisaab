@@ -13,6 +13,7 @@ class ClaimsScreen extends StatelessWidget {
     final d = StoreScope.of(context).data!;
     final claims = d.claims.reversed.toList();
     return ListView(
+      key: const Key('claims-list'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         const Padding(

@@ -40,6 +40,7 @@ class RefillsScreen extends StatelessWidget {
     final low = lowStock(d.meds);
 
     return ListView(
+      key: const ValueKey('list-refills'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         if (low.isNotEmpty)

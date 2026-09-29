@@ -24,6 +24,7 @@ class TodayScreen extends StatelessWidget {
     final taken = doses.where((x) => d.logs[x.key(today)]?.s == 'taken').length;
 
     return ListView(
+      key: const ValueKey('list-today'),
       padding: const EdgeInsets.only(bottom: 96),
       children: [
         for (final m in missed) _MissedAlert(dose: m, now: now),

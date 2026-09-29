@@ -31,21 +31,37 @@ class _TopicPlan extends StatelessWidget {
         Text("This week's focus, weakest first. Each block is 25 minutes of learning, then 10 questions.", style: tt.bodyMedium),
         const SizedBox(height: 8),
         for (var i = 0; i < topics.length; i++)
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: SizedBox(
-              width: 52,
-              child: Center(
-                child: topics[i].started
-                    ? Pill('${topics[i].percent}%',
-                        bg: masterySoft(context, topics[i].percent), fg: masteryColor(context, topics[i].percent))
-                    : Pill('new', bg: Theme.of(context).colorScheme.surfaceContainerHighest, fg: Theme.of(context).colorScheme.onSurface),
-              ),
-            ),
-            title: Text(topics[i].topic),
-            subtitle: Text(
-              '${i == 0 ? 'Today' : dayName(addDaysIso(today, i))} · '
-              '${topics[i].percent < 55 ? 'Re-read your notes + 20 questions' : '10 questions + shortcuts'}',
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 56,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: topics[i].started
+                        ? Pill('${topics[i].percent}%',
+                            bg: masterySoft(context, topics[i].percent), fg: masteryColor(context, topics[i].percent))
+                        : Pill('new',
+                            bg: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            fg: Theme.of(context).colorScheme.onSurface),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(topics[i].topic, style: tt.titleMedium),
+                      Text(
+                        '${i == 0 ? 'Today' : dayName(addDaysIso(today, i))} · '
+                        '${topics[i].percent < 55 ? 'Re-read your notes + 20 questions' : '10 questions + shortcuts'}',
+                        style: tt.bodyMedium?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         const SizedBox(height: 12),

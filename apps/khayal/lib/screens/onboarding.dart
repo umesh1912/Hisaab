@@ -80,6 +80,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
+      key: const ValueKey('list-onboarding'),
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
           children: [
             Container(

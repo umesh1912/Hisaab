@@ -17,6 +17,7 @@ class RemindersScreen extends StatelessWidget {
     final all = [...d.reminders]..sort((a, b) => a.date.compareTo(b.date));
 
     return ListView(
+      key: const Key('reminders-list'),
       padding: const EdgeInsets.only(bottom: 32),
       children: [
         const Padding(
